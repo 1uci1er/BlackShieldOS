@@ -1,0 +1,83 @@
+#!/bin/bash
+
+# Update and upgrade the system
+echo "Updating and upgrading the system..."
+sudo apt update && sudo apt upgrade -y
+
+# Function to install tools
+install_tools() {
+    echo "Installing $1 tools..."
+    for tool in "${!2}"; do
+        echo "Installing $tool..."
+        sudo apt install -y "$tool"
+    done
+}
+
+# Define tools by category
+declare -A tools
+
+# Bug Bounty tools
+tools[Bug_Bounty]="Burp Suite owasp-zap sqlmap nmap amass sublist3r nuclei ffuf gobuster wfuzz"
+
+# Install each category of tools
+for category in "${!tools[@]}"; do
+    install_tools "$category" "tools[$category]"
+done
+
+echo "All tools installed successfully!"
+
+# Create a cheat sheet text file
+cheat_sheet_file="bug_bounty_cheat_sheet.txt"
+
+echo "Creating cheat sheet for Bug Bounty tools..."
+
+cat <<EOL > $cheat_sheet_file
+# Bug Bounty Tools Cheat Sheet
+
+1. **Burp Suite**
+   - Usage: Intercept and modify HTTP requests.
+   - Command: Launch from terminal: `burpsuite`
+
+2. **OWASP ZAP**
+   - Usage: Automated scanner for web applications.
+   - Command: Launch from terminal: `zap`
+
+3. **SQLMap**
+   - Usage: Automate the process of detecting and exploiting SQL injection vulnerabilities.
+   - Command: `sqlmap -u <URL> --dbs`
+
+4. **Nmap**
+   - Usage: Network discovery and security auditing.
+   - Command: `nmap -sS -p 1-65535 <target>`
+
+5. **Amass**
+   - Usage: DNS enumeration and network mapping.
+   - Command: `amass enum -d <domain>`
+
+6. **Sublist3r**
+   - Usage: Fast subdomain enumeration tool.
+   - Command: `sublist3r -d <domain>`
+
+7. **Nuclei**
+   - Usage: Fast and customizable vulnerability scanner.
+   - Command: `nuclei -u <URL>`
+
+8. **FFUF**
+   - Usage: Fuzzing tool for web applications.
+   - Command: `ffuf -u <URL>/FUZZ -w <wordlist>`
+
+9. **Gobuster**
+   - Usage: Directory and file brute-forcing tool.
+   - Command: `gobuster dir -u <URL> -w <wordlist>`
+
+10. **Wfuzz**
+    - Usage: Web application brute-forcer.
+    - Command: `wfuzz -c -z file,<wordlist> -u <URL>`
+
+EOL
+
+echo "Cheat sheet created: $cheat_sheet_file"
+
+# Clean up
+sudo apt autoremove -y
+echo "Cleanup completed."
